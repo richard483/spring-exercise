@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface UserRepository extends CrudRepository<User, Integer> {
     List<User> findUserByNameContains(String name);
+
     Page<User> findUserByNameContains(String name, Pageable pageable);
 
     User findUserById(Integer id);
