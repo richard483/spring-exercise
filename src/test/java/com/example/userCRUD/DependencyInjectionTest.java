@@ -1,5 +1,6 @@
 package com.example.userCRUD;
 
+import com.example.userCRUD.configurations.DependencyInjectionConfiguration;
 import com.example.userCRUD.data.Bar;
 import com.example.userCRUD.data.Foo;
 import com.example.userCRUD.data.FooBar;

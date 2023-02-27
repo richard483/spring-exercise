@@ -1,4 +1,4 @@
-package com.example.userCRUD;
+package com.example.userCRUD.configurations;
 
 import com.example.userCRUD.data.Foo;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,12 @@
-package com.example.userCRUD;
+package com.example.userCRUD.configurations;
 
 import com.example.userCRUD.data.Bar;
 import com.example.userCRUD.data.Foo;
 import com.example.userCRUD.data.FooBar;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class DependencyInjectionConfiguration {
 
   @Bean

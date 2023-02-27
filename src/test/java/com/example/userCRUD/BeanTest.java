@@ -1,5 +1,6 @@
 package com.example.userCRUD;
 
+import com.example.userCRUD.configurations.BeanConfiguration;
 import com.example.userCRUD.data.Foo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
