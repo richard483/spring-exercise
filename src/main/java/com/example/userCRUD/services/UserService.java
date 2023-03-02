@@ -49,11 +49,16 @@ public class UserService {
     try {
       PageRequest pageRequest = PageRequest.of(page - 1, elements);
       users = userRepository.findUserByNameContains(name, pageRequest);
+
+      if (users.getNumberOfElements() == 0)
+        throw new Exception("There are no items for this page");
+
       responseBody.put("message", "Page " + (page + 1) + " of " + users.getTotalPages());
       responseBody.put("data", users);
       return new ResponseEntity<>(responseBody, HttpStatus.OK);
     } catch (Exception e) {
-      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+      responseBody.put("message", e.getMessage());
+      return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
   }
 

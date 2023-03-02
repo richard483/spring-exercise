@@ -1,6 +1,8 @@
 package com.example.userCRUD;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -40,7 +42,7 @@ class UserCrudApplicationTests {
         .isOk()
         .expectBody()
         .jsonPath("$['data'].['content'].length()")
-        .isEqualTo(8); //paging = 5 by default
+        .isEqualTo(elements);
   }
 
   @Test
@@ -56,6 +58,59 @@ class UserCrudApplicationTests {
         .exchange()
         .expectStatus()
         .isNotFound()
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("There are no items for this page");
+  }
+
+  @Test
+  void searchUser_withSearchString_success() {
+    String searchString = "ja";
+
+    JSONObject response = null;
+    try {
+      response = new JSONObject(new String(webTestClient.get()
+          .uri(uriBuilder -> uriBuilder.path("/user/search")
+              .queryParam("name", searchString)
+              .build())
+          .exchange()
+          .expectStatus()
+          .isOk()
+          .expectBody()
+          .jsonPath("$['data'].['content']")
+          .isNotEmpty()
+          .returnResult()
+          .getResponseBody()));
+
+      // check if all response data has a substring of searched keyword
+      for (int i = 0; i < response.getJSONObject("data").getJSONArray("content").length(); i++) {
+        Assert.assertTrue(response.getJSONObject("data")
+            .getJSONArray("content")
+            .getJSONObject(1)
+            .getString("name")
+            .contains(searchString));
+      }
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Test
+  void searchUser_withNoItemsOnThePage_fail() {
+    String searchString = "a";
+    Integer elements = 8;
+    Integer page = 10;
+
+    webTestClient.get()
+        .uri(uriBuilder -> uriBuilder.path("/user/search")
+            .queryParam("name", searchString)
+            .queryParam("elements", elements)
+            .queryParam("page", page)
+            .build())
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
         .expectBody()
         .jsonPath("$['message']")
         .isEqualTo("There are no items for this page");
