@@ -1,31 +1,42 @@
 package com.example.userCRUD.models;
 
-import jakarta.persistence.*;
+import com.example.userCRUD.constants.ERole;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.Instant;
 
 @Data
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
-    @Id
-    @Setter(AccessLevel.PROTECTED)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  @Id
+  @Setter(AccessLevel.PROTECTED)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
+  private String name;
+  private String email;
+  private String password;
+  private String address;
+  private ERole role;
 
-    private String name;
-    private String email;
-    private String password;
-    private String address;
+  @CreatedDate private Instant createdDate;
 
-    public User(String name, String email, String password, String address) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.address = address;
-    }
 }
