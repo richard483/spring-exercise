@@ -25,14 +25,19 @@ public class UserService {
     Page<User> users;
     Map<String, Object> responseBody = new HashMap<>();
     try {
-      PageRequest pageRequest = PageRequest.of(page, elements);
+      PageRequest pageRequest = PageRequest.of(page - 1, elements);
       users = userRepository.findAll(pageRequest);
+
+      if (users.getNumberOfElements() == 0)
+        throw new Exception("There are no items for this page");
+
       responseBody.put("message", "Page " + (page + 1) + " of " + users.getTotalPages());
       responseBody.put("data", users);
 
       return new ResponseEntity<>(responseBody, HttpStatus.OK);
     } catch (Exception e) {
-      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+      responseBody.put("message", e.getMessage());
+      return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -42,7 +47,7 @@ public class UserService {
     Page<User> users;
     Map<String, Object> responseBody = new HashMap<>();
     try {
-      PageRequest pageRequest = PageRequest.of(page, elements);
+      PageRequest pageRequest = PageRequest.of(page - 1, elements);
       users = userRepository.findUserByNameContains(name, pageRequest);
       responseBody.put("message", "Page " + (page + 1) + " of " + users.getTotalPages());
       responseBody.put("data", users);

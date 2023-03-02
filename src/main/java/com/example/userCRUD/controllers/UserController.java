@@ -29,14 +29,14 @@ public class UserController {
   @Autowired UserService userService;
 
   @GetMapping("/all")
-  public ResponseEntity<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") Integer page,
+  public ResponseEntity<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "5") Integer elements) {
     return userService.getAllUsers(page, elements);
   }
 
   @GetMapping("/search")
   public ResponseEntity<Map<String, Object>> searchUserByName(@RequestParam String name,
-      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "5") Integer elements) {
     return userService.searchUserByName(name, page, elements);
   }
