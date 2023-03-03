@@ -17,6 +17,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Data
 @Builder
@@ -39,4 +41,7 @@ public class User {
 
   @CreatedDate private Instant createdDate;
 
+  public boolean isAllValueNull() {
+    return Stream.of(id, name, email, password, address, role).allMatch(Objects::isNull);
+  }
 }

@@ -102,7 +102,7 @@ public class UserService {
       responseBody.put("message", "User: " + user.getName() + " deleted!");
       return new ResponseEntity<>(responseBody, HttpStatus.OK);
     } catch (Exception e) {
-      responseBody.put("data", e.getMessage());
+      responseBody.put("message", e.getMessage());
       return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
   }
@@ -111,10 +111,14 @@ public class UserService {
     Map<String, Object> responseBody = new HashMap<>();
 
     try {
+      if (user.isAllValueNull())
+        throw new Exception("There are no value of user attribute given");
       User userTemp = userRepository.findUserById(id);
-      String userName = userTemp.getName();
+
       if (userTemp == null)
-        throw new RuntimeException("There are no user with such id");
+        throw new Exception("There are no user with such id");
+
+      String userName = userTemp.getName();
       userTemp.setAddress(user.getAddress());
       userTemp.setEmail(user.getEmail());
       userTemp.setName(user.getName());
@@ -124,7 +128,7 @@ public class UserService {
       responseBody.put("message", "User: " + userName + " updated to " + user.getName() + " !");
       return new ResponseEntity<>(responseBody, HttpStatus.OK);
     } catch (Exception e) {
-      responseBody.put("data", e.getMessage());
+      responseBody.put("message", e.getMessage());
       return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
   }

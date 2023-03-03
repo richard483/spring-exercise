@@ -1,10 +1,14 @@
 package com.example.userCRUD;
 
+import com.example.userCRUD.constants.ERole;
+import com.example.userCRUD.models.User;
+import com.example.userCRUD.repositories.UserRepository;
 import com.example.userCRUD.requests.CreateUserRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -22,6 +26,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 class UserCrudApplicationTests {
 
   @Autowired private WebTestClient webTestClient;
+
+  @Autowired private UserRepository userRepository;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -194,5 +200,125 @@ class UserCrudApplicationTests {
         .expectBody()
         .jsonPath("$['message']")
         .isEqualTo("There are no given value of user!");
+  }
+
+  @Test
+  void deleteUSer_withGivenId_success() {
+    Integer id = 5;
+    String name = "john"; // based on init.sql
+
+    webTestClient.delete()
+        .uri(uriBuilder -> uriBuilder.path("/user").queryParam("id", id).build())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectHeader()
+        .contentType(MediaType.APPLICATION_JSON)
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("User: " + name + " deleted!");
+
+    Assertions.assertNull(userRepository.findUserById(id));
+
+  }
+
+  @Test
+  void deleteUser_withGivenWrongId_fail() {
+    Integer id = 20;
+
+    webTestClient.delete()
+        .uri(uriBuilder -> uriBuilder.path("/user").queryParam("id", id).build())
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectHeader()
+        .contentType(MediaType.APPLICATION_JSON)
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("There are no user with such id");
+
+  }
+
+  @Test
+  void updateUser_withGivenObjectValue_success() {
+    Integer id = 2;
+    User user = User.builder()
+        .name("Takina")
+        .email("sakana@ricorico.co.jp")
+        .password("iki password")
+        .address("cafe")
+        .role(ERole.valueOf("MEMBER"))
+        .build();
+
+    webTestClient.patch()
+        .uri(uriBuilder -> uriBuilder.path("/user/" + id).build())
+        .accept(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(user))
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("User: richard updated to " + user.getName() + " !");
+  }
+
+  @Test
+  void updateUser_withNotAllGivenObjectValue_success() {
+    Integer id = 2;
+    User user = User.builder()
+        .name("Takina")
+        .email("sakana@ricorico.co.jp")
+        .password("iki password")
+        .build();
+
+    webTestClient.patch()
+        .uri(uriBuilder -> uriBuilder.path("/user/" + id).build())
+        .accept(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(user))
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("User: richard updated to " + user.getName() + " !");
+  }
+
+  @Test
+  void updateUser_withNoGivenObjectValue_fail() {
+    Integer id = 2;
+    User user = User.builder()
+        .build();
+
+    webTestClient.patch()
+        .uri(uriBuilder -> uriBuilder.path("/user/" + id).build())
+        .accept(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(user))
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("There are no value of user attribute given");
+  }
+
+  @Test
+  void updateUser_withFalseId_fail() {
+    Integer id = 20;
+    User user = User.builder()
+        .name("Takina")
+        .email("sakana@ricorico.co.jp")
+        .password("iki password")
+        .build();
+
+    webTestClient.patch()
+        .uri(uriBuilder -> uriBuilder.path("/user/" + id).build())
+        .accept(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(user))
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("There are no user with such id");
   }
 }
