@@ -69,14 +69,19 @@ public class UserService {
   public ResponseEntity<Map<String, Object>> createUser(CreateUserRequest userRequest) {
     Map<String, Object> responseBody = new HashMap<>();
     try {
+      User requestedUser;
+      try {
+        requestedUser = User.builder()
+            .name(userRequest.getName())
+            .email(userRequest.getEmail())
+            .address(userRequest.getAddress())
+            .password(userRequest.getPassword())
+            .role(ERole.valueOf(userRequest.getRole()))
+            .build();
+      } catch (Exception e) {
+        throw new Exception("There are no given value of user!");
+      }
 
-      User requestedUser = User.builder()
-          .name(userRequest.getName())
-          .email(userRequest.getEmail())
-          .address(userRequest.getAddress())
-          .password(userRequest.getPassword())
-          .role(ERole.valueOf(userRequest.getRole()))
-          .build();
 
       userRepository.save(requestedUser);
       responseBody.put("message", "User " + requestedUser.getName() + " created!");
