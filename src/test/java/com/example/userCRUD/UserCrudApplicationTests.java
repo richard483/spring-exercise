@@ -8,20 +8,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.time.Instant;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
-@Sql(scripts = {"classpath:init.sql"},
-    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//@Sql(scripts = {"classpath:init.sql"},
+//    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @AutoConfigureWebTestClient
 class UserCrudApplicationTests {
 
@@ -30,6 +33,114 @@ class UserCrudApplicationTests {
   @Autowired private UserRepository userRepository;
 
   @Autowired private ObjectMapper objectMapper;
+
+  @BeforeEach
+  void beforEach() {
+    this.userRepository.save(User.builder()
+        .id(1)
+        .name("admin")
+        .email("admin@localhost")
+        .password("admin")
+        .role(ERole.valueOf("ADMIN"))
+        .address("Admin's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(2)
+        .name("richard")
+        .email("richard@localhost")
+        .password("richard")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Richard's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(3)
+        .name("james")
+        .email("james@localhost")
+        .password("james")
+        .role(ERole.valueOf("MEMBER"))
+        .address("James's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(4)
+        .name("jane")
+        .email("jane@localhost")
+        .password("jane")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Jane's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(5)
+        .name("john")
+        .email("john@localhost")
+        .password("john")
+        .role(ERole.valueOf("MEMBER"))
+        .address("John's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(6)
+        .name("jim")
+        .email("jim@localhost")
+        .password("jim")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Jim's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(7)
+        .name("jenny")
+        .email("jenny@localhost")
+        .password("jenny")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Jenny's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(8)
+        .name("jessica")
+        .email("jessica@localhost")
+        .password("jessica")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Jessica's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(9)
+        .name("ewiwa")
+        .email("ewiwa@localhost")
+        .password("ewiwa")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Ewiwa's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(10)
+        .name("wosemi")
+        .email("wosemi@localhost")
+        .password("wosemi")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Wosemi's house")
+        .createdDate(Instant.now())
+        .build());
+    this.userRepository.save(User.builder()
+        .id(11)
+        .name("selen")
+        .email("selen@localhost")
+        .password("selen")
+        .role(ERole.valueOf("MEMBER"))
+        .address("Selen's house")
+        .createdDate(Instant.now())
+        .build());
+  }
+
+  @AfterEach
+  void afterEach() {
+    this.userRepository.deleteAll();
+  }
 
   @Test
   void getAllUser_byDefaultPaging_success() {
@@ -204,8 +315,9 @@ class UserCrudApplicationTests {
 
   @Test
   void deleteUSer_withGivenId_success() {
-    Integer id = 5;
-    String name = "john"; // based on init.sql
+    User user = userRepository.findUserByNameContains("john").get(0);
+    Integer id = user.getId();
+    String name = user.getName(); // based on init.sql
 
     webTestClient.delete()
         .uri(uriBuilder -> uriBuilder.path("/user").queryParam("id", id).build())
@@ -241,7 +353,8 @@ class UserCrudApplicationTests {
 
   @Test
   void updateUser_withGivenObjectValue_success() {
-    Integer id = 2;
+    User userTemp = userRepository.findUserByNameContains("john").get(0);
+    Integer id = userTemp.getId();
     User user = User.builder()
         .name("Takina")
         .email("sakana@ricorico.co.jp")
@@ -259,12 +372,13 @@ class UserCrudApplicationTests {
         .isOk()
         .expectBody()
         .jsonPath("$['message']")
-        .isEqualTo("User: richard updated to " + user.getName() + " !");
+        .isEqualTo("User: " + userTemp.getName() + " updated to " + user.getName() + " !");
   }
 
   @Test
   void updateUser_withNotAllGivenObjectValue_success() {
-    Integer id = 2;
+    User userTemp = userRepository.findUserByNameContains("john").get(0);
+    Integer id = userTemp.getId();
     User user = User.builder()
         .name("Takina")
         .email("sakana@ricorico.co.jp")
@@ -280,14 +394,13 @@ class UserCrudApplicationTests {
         .isOk()
         .expectBody()
         .jsonPath("$['message']")
-        .isEqualTo("User: richard updated to " + user.getName() + " !");
+        .isEqualTo("User: " + userTemp.getName() + " updated to " + user.getName() + " !");
   }
 
   @Test
   void updateUser_withNoGivenObjectValue_fail() {
     Integer id = 2;
-    User user = User.builder()
-        .build();
+    User user = User.builder().build();
 
     webTestClient.patch()
         .uri(uriBuilder -> uriBuilder.path("/user/" + id).build())
@@ -303,7 +416,7 @@ class UserCrudApplicationTests {
 
   @Test
   void updateUser_withFalseId_fail() {
-    Integer id = 20;
+    Integer id = 99999;
     User user = User.builder()
         .name("Takina")
         .email("sakana@ricorico.co.jp")
