@@ -50,8 +50,12 @@ public class UserService {
       PageRequest pageRequest = PageRequest.of(page - 1, elements);
       users = userRepository.findUserByNameContains(name, pageRequest);
 
-      if (users.getNumberOfElements() == 0)
+      if (users.getNumberOfElements() == 0) {
+        if (page == 1)
+          throw new Exception("There are no results of your search");
+
         throw new Exception("There are no items for this page");
+      }
 
       responseBody.put("message", "Page " + (page + 1) + " of " + users.getTotalPages());
       responseBody.put("data", users);

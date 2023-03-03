@@ -115,4 +115,24 @@ class UserCrudApplicationTests {
         .jsonPath("$['message']")
         .isEqualTo("There are no items for this page");
   }
+
+  @Test
+  void searchUser_withNoItemsOnSearchResult_fail() {
+    String searchString = "aasdasdasd";
+    Integer elements = 8;
+    Integer page = 1;
+
+    webTestClient.get()
+        .uri(uriBuilder -> uriBuilder.path("/user/search")
+            .queryParam("name", searchString)
+            .queryParam("elements", elements)
+            .queryParam("page", page)
+            .build())
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody()
+        .jsonPath("$['message']")
+        .isEqualTo("There are no results of your search");
+  }
 }
